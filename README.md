@@ -12,11 +12,11 @@ Welcome to the Tokenizers and HuggingFace Models Colab project. This notebook sh
 1. Open your terminal or command prompt.  
 2. Clone the repository:  
    ```bash
-   git clone <your-repo-url>
+   git clone [<your-repo-url>](https://github.com/premkumarkora/Tokenizers_in_HuggingFace_Models)
    ```  
 3. Change to the project directory:  
    ```bash
-   cd <repo-folder>
+   cd Tokenizers_in_HuggingFace_Models
    ```  
 
 ## Running the Colab Notebook
