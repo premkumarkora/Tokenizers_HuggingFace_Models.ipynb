@@ -1,6 +1,6 @@
 # Tokenizers & HuggingFace Models Colab
 
-![GitHub Repo Size](https://img.shields.io/github/repo-size/premkumarkora/Tokenizers_HuggingFace_Models)
+
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
 ## Overview
