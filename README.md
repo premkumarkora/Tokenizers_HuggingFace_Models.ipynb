@@ -1,102 +1,73 @@
-# Kora-2-2B-IT
+# Tokenizers & HuggingFace Models Colab
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Model-blue.svg)](https://huggingface.co/premkumarkora/kora-2-2b-it)
+![GitHub Repo Size](https://img.shields.io/github/repo-size/premkumarkora/Tokenizers_HuggingFace_Models)
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
-**Kora-2-2B-IT** is a highly memory-efficient, instruction-tuned variant of Google’s Gemma-2 2B model.  
-Quantized to 4-bit NF4 with double quantization and leveraging bfloat16 for compute, it delivers state-of-the-art text generation performance in just ~2.2 GB of GPU memory.
+## Overview
+
+This Google Colab notebook, **Tokenizers & HuggingFace Models**, demonstrates how to leverage the Hugging Face Transformers library to:
+
+- **Load** and configure tokenizers for various pre-trained models.
+- **Apply** chat-style templates for prompt engineering.
+- **Quantize** and optimize model memory usage with BitsAndBytes.
+- **Stream** token-by-token generation for interactive applications.
+- **Integrate** end-to-end into your Git version control workflow.
+
+Whether you are building chatbots, text generators, or experimenting with quantized inference, this notebook provides a clear, step-by-step guide.
 
 ## Table of Contents
 
-- [Key Features](#key-features)
-- [Quick Start](#quick-start)
-- [Installation](#installation)
-- [Downloading the Model](#downloading-the-model)
-- [Usage Example](#usage-example)
-- [Quantization Configuration](#quantization-configuration)
-- [Model Card](#model-card)
-- [License](#license)
-- [Citation](#citation)
-- [Contact](#contact)
+1. [Prerequisites](#prerequisites)  
+2. [Setup](#setup)  
+3. [Notebook Structure](#notebook-structure)  
+4. [Key Sections](#key-sections)  
+5. [Running the Notebook](#running-the-notebook)  
+6. [Git Integration](#git-integration)  
+7. [Troubleshooting](#troubleshooting)  
+8. [License](#license)  
 
-## Key Features
+## Prerequisites
 
-- **2.61 B parameters** quantized to 4-bit NF4  
-- **~2.2 GB** GPU footprint with `device_map="auto"`  
-- Optimized for chatbots, summarization, Q&A, translation, and general text generation  
-- Streaming-friendly inference via `bitsandbytes` and `transformers`
+- A **Google account** for Colab.  
+- **Git** installed locally (optional, for version control).  
+- Basic familiarity with Python and Jupyter notebooks.
 
-## Quick Start
+## Setup
 
-1. **Clone the repository**  
+1. **Clone this repository** (if you haven’t already):
    ```bash
-   git clone https://github.com/premkumarkora/kora-2-2b-it.git
-   cd kora-2-2b-it
+   git clone https://github.com/premkumarkora/Tokenizers_HuggingFace_Models.git
+   cd Tokenizers_HuggingFace_Models
    ```
-2. **Install dependencies**  
+2. **Open in Colab**:  
+   - Visit [Google Colab](https://colab.research.google.com).  
+   - Select **File → Open notebook → GitHub**.  
+   - Paste the repository URL and open `Tokenizers_HuggingFace_Models.ipynb`.
+3. **Install dependencies** (in the first notebook cell):
    ```bash
-   pip install -r requirements.txt
-   ```
-3. **Run the example**  
-   ```bash
-   python example_generate.py
+   !pip install -q transformers torch bitsandbytes sentencepiece accelerate
    ```
 
-## Installation
+## Notebook Structure
 
-Install core libraries using pip:
+- **Section 1: Environment Setup**  
+  Installs required packages and configures GPU/quantization settings.
+- **Section 2: Tokenizer Loading**  
+  Demonstrates loading different tokenizers and configuring chat templates.
+- **Section 3: Model Quantization**  
+  Shows how to define `BitsAndBytesConfig` for optimal 4-bit NF4 quantization.
+- **Section 4: Generation Function**  
+  Implements a reusable `generate()` function for streaming inference.
+- **Section 5: Memory Profiling**  
+  Explains how to measure the model’s GPU memory footprint.
+- **Section 6: Example Runs**  
+  Runs sample prompts for chat, translation, and summarization.
+- **Section 7: Git & Colab Integration**  
+  Provides commands for syncing notebook changes back to GitHub.
 
-```bash
-pip install transformers torch bitsandbytes sentencepiece accelerate huggingface_hub
-```
+## Key Sections
 
-## Downloading the Model
-
-- **Via Hugging Face CLI**  
-  ```bash
-  huggingface-cli login
-  huggingface-cli repo clone premkumarkora/kora-2-2b-it
-  ```
-- **Via Transformers API**  
-  ```python
-  from transformers import AutoTokenizer, AutoModelForCausalLM
-
-  tokenizer = AutoTokenizer.from_pretrained("premkumarkora/kora-2-2b-it")
-  model     = AutoModelForCausalLM.from_pretrained("premkumarkora/kora-2-2b-it")
-  ```
-
-## Usage Example
-
-```python
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
-from bitsandbytes import BitsAndBytesConfig
-
-# Quantization setup
-quant_cfg = BitsAndBytesConfig(
-    load_in_4bit=True,
-    bnb_4bit_use_double_quant=True,
-    bnb_4bit_compute_dtype="bfloat16",
-    bnb_4bit_quant_type="nf4"
-)
-
-# Load model and tokenizer
-tokenizer = AutoTokenizer.from_pretrained("premkumarkora/kora-2-2b-it")
-model     = AutoModelForCausalLM.from_pretrained(
-    "premkumarkora/kora-2-2b-it",
-    quantization_config=quant_cfg,
-    device_map="auto"
-)
-
-# Generate text
-prompt = "Translate to Shakespearean English: Hello, friend!"
-inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
-outputs = model.generate(**inputs, max_new_tokens=60)
-print(tokenizer.decode(outputs[0], skip_special_tokens=True))
-```
-
-## Quantization Configuration
-
+### Quantization Config
 ```python
 from bitsandbytes import BitsAndBytesConfig
 
@@ -108,29 +79,52 @@ quant_config = BitsAndBytesConfig(
 )
 ```
 
-- **Scheme:** NF4 (4-bit NormalFloat) with double quantization  
-- **Compute dtype:** bfloat16  
-- **Memory footprint:** ~2,192 MB on GPU  
+### Generate Function
+```python
+def generate(model_name, messages):
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer.pad_token = tokenizer.eos_token
+    inputs = tokenizer.apply_chat_template(
+        messages, return_tensors="pt", add_generation_prompt=True
+    ).to("cuda")
+    streamer = TextStreamer(tokenizer)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name, device_map="auto", quantization_config=quant_config
+    )
+    model.generate(inputs, max_new_tokens=80, streamer=streamer)
+```
 
-## Model Card
+### Memory Footprint Example
+```python
+memory_mb = model.get_memory_footprint() / 1e6
+print(f"Memory footprint: {memory_mb:,.1f} MB")
+```
 
-Detailed information is available on the [Hugging Face model page](https://huggingface.co/premkumarkora/kora-2-2b-it).
+## Running the Notebook
+
+1. **Select GPU**: Runtime → Change runtime type → GPU.  
+2. **Run all cells**: Runtime → Run all.  
+3. **Interact**: Modify prompts or model names, then re-run relevant cells.
+
+## Git Integration
+
+```bash
+!git config --global user.name "Your Name"
+!git config --global user.email "you@example.com"
+!git add Tokenizers_HuggingFace_Models.ipynb
+!git commit -m "Update notebook"
+!git push origin main
+```
+
+## Troubleshooting
+
+- **TOKENIZERS_PARALLELISM warning**: Add at top of notebook:
+  ```python
+  import os
+  os.environ["TOKENIZERS_PARALLELISM"] = "false"
+  ```
+- **CUDA OOM**: Lower `max_new_tokens` or offload layers via `device_map`.
 
 ## License
 
-Licensed under the [Apache 2.0 License](https://opensource.org/licenses/Apache-2.0).
-
-## Citation
-
-```bibtex
-@misc{kora-2-2b-it,
-  title        = {Kora-2-2B-IT: A 4-bit Quantized Instruction-Tuned Variant of Gemma-2},
-  author       = {Google Research and premkumarkora},
-  year         = {2024},
-  howpublished = {\url{https://huggingface.co/premkumarkora/kora-2-2b-it}}
-}
-```
-
-## Contact
-
-For questions or feedback, please open an issue in this repository or connect via LinkedIn.
+This notebook and associated code are released under the [MIT License](LICENSE).
